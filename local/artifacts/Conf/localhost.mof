@@ -1,0 +1,50 @@
+/*
+@TargetNode='localhost'
+@GeneratedBy=codespace
+@GenerationDate=07/12/2023 22:37:05
+@GenerationHost=codespaces-2e2bb3
+*/
+
+instance of nxFile as $nxFile1ref
+{
+Owner = "root";
+ Group = "root";
+ Type = "File";
+ DestinationPath = "/tmp/myfile";
+ Mode = "0777";
+ ModuleVersion = "0.2.0";
+ ModuleName = "nxtools";
+ Ensure = "Present";
+ SourceInfo = "/workspaces/nxtools/local/artifacts/Conf.ps1::3::5::nxFile";
+ ResourceID = "[nxFile]MyFile";
+ ConfigurationName = "Conf";
+};
+instance of nxFileLine as $nxFileLine1ref
+{
+DoesNotContainPattern = "Defaults:monuser[ ]+requiretty";
+ FilePath = "/tmp/sudoers.1";
+ ModuleVersion = "0.2.0";
+ ModuleName = "nxtools";
+ SourceInfo = "/workspaces/nxtools/local/artifacts/Conf.ps1::15::5::nxFileLine";
+ ResourceID = "[nxFileLine]DoNotRequireTTY";
+ ContainsLine = "Defaults:monuser !requiretty";
+ ConfigurationName = "Conf";
+};
+instance of OMI_ConfigurationDocument
+
+                    {
+ Version="2.0.0";
+
+                        MinimumCompatibleVersion = "1.0.0";
+
+                        CompatibleVersionAdditionalProperties= {"Omi_BaseResource:ConfigurationName"};
+
+                        Author="codespace";
+
+                        GenerationDate="07/12/2023 22:37:05";
+
+                        GenerationHost="codespaces-2e2bb3";
+
+                        Name="Conf";
+
+                    };

@@ -27,7 +27,7 @@ class nxFileLine
     [string] $LinePattern
 
     [DscProperty(NotConfigurable)]
-    [Reason[]] $Reasons
+    [NxFileLineReason[]] $Reasons
 
     [nxFileLine] Get()
     {
@@ -42,7 +42,7 @@ class nxFileLine
 
         if (-not (Test-Path -Path $this.FilePath -ErrorAction Ignore))
         {
-            $currentState.Reasons = [Reason]@{
+            $currentState.Reasons = [NxFileLineReason]@{
                 Code    = '{0}:{0}:FileNotFound' -f $this.GetType()
                 Phrase  = "The file '$this.filePath' was not found."
             }
@@ -52,7 +52,7 @@ class nxFileLine
         elseif ((Get-Item -Path $this.FilePath).count -gt 1)
         {
             $allFiles = Get-Item -Path $this.FilePath
-            $currentState.Reasons = [Reason]@{
+            $currentState.Reasons = [NxFileLineReason]@{
                 Code   = '{0}:{0}:ResolvedToMultipleFiles' -f $this.GetType()
                 Phrase = "The Path '$($this.FilePath)' resolved to multiple paths: ['$($allFiles -join "','")']."
             }
@@ -67,7 +67,7 @@ class nxFileLine
             {
                 Write-Verbose -Message "The line '$($this.ContainsLine)' was found $($foundLines.count) times."
                 $currentState.Reasons = $foundLines.Foreach{
-                    [Reason]@{
+                    [NxFileLineReason]@{
                         Code   = '{0}:{0}:LineFound' -f $this.GetType()
                         Phrase = "[Compliant]The expected line '$($_.Pattern)' was found at line number '$($_.LineNumber)'."
                     }
@@ -76,7 +76,7 @@ class nxFileLine
             else
             {
                 Write-Verbose -Message "The line '$($this.ContainsLine)' was not found."
-                $currentState.Reasons = [Reason]@{
+                $currentState.Reasons = [NxFileLineReason]@{
                     Code   = '{0}:{0}:LineNotFound' -f $this.GetType()
                     Phrase = "Can't find the expected line '$($this.ContainsLine)'."
                 }
@@ -87,7 +87,7 @@ class nxFileLine
         {
             $shouldNotFindPattern = Select-String -Path $this.FilePath -Pattern $this.DoesNotContainPattern -AllMatches -CaseSensitive:$this.CaseSensitive
             $currentState.Reasons += $shouldNotFindPattern.Foreach{
-                [Reason]@{
+                [NxFileLineReason]@{
                     Code   = '{0}:{0}:LineUnexpected' -f $this.GetType()
                     Phrase = "The pattern '$($_.Pattern)' was found at line '$($_.LineNumber)' but is expeced to be absent."
                 }

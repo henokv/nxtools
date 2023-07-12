@@ -4,7 +4,7 @@ $script:localizedDataNxFile = Get-LocalizedData -DefaultUICulture 'en-US' -FileN
 class nxFile
 {
     [DscProperty()]
-    [Ensure] $Ensure
+    [NxFileEnsure] $Ensure
 
     [DscProperty(key)]
     [System.String] $DestinationPath
@@ -39,7 +39,7 @@ class nxFile
     #Links (follow | manage | ignore)
 
     [DscProperty()]
-    [Reason[]] $Reasons
+    [NxFileReason[]] $Reasons
 
     [nxFile] Get()
     {
@@ -53,7 +53,7 @@ class nxFile
 
         if ($nxFileSystemInfo) # The file/folder/link exists
         {
-            $currentState.Ensure = [Ensure]::Present
+            $currentState.Ensure = [NxFileEnsure]::Present
             $currentState.Owner = $nxFileSystemInfo.nxOwner
             $currentState.Group = $nxFileSystemInfo.nxGroup
             $currentState.Type  = $nxFileSystemInfo.nxFileSystemItemType
@@ -188,7 +188,7 @@ class nxFile
             else
             {
                 # if we don't check against the source, against a provided checksum, or against the provided content
-                # assume it's the same file because the file already exists ([ensure]::Present)
+                # assume it's the same file because the file already exists ([NxFileEnsure]::Present)
                 $isSameFile = $true
             }
 
@@ -225,7 +225,7 @@ class nxFile
             {
                 'Ensure'
                 {
-                    [Reason]@{
+                    [NxFileReason]@{
                         Code = '{0}:{0}:Ensure' -f $this.GetType()
                         Phrase = $script:localizedDataNxFile.nxFileShouldBeAbsent -f $this.DestinationPath
                     }
@@ -233,7 +233,7 @@ class nxFile
 
                 'Type'
                 {
-                    [Reason]@{
+                    [NxFileReason]@{
                         Code = '{0}:{0}:Type' -f $this.GetType()
                         Phrase = $script:localizedDataNxFile.TypeMismatch -f $this.DestinationPath, $this.Type, $currentState.Type
                     }
@@ -242,7 +242,7 @@ class nxFile
 
                 'Contents'
                 {
-                    [Reason]@{
+                    [NxFileReason]@{
                         Code = '{0}:{0}:Contents' -f $this.GetType()
                         Phrase = $script:localizedDataNxFile.ContentsMismatch -f $this.DestinationPath, $this.Contents, $currentState.Contents
                     }
@@ -250,7 +250,7 @@ class nxFile
 
                 'Checksum'
                 {
-                    [Reason]@{
+                    [NxFileReason]@{
                         Code = '{0}:{0}:Checksum' -f $this.GetType()
                         Phrase = $script:localizedDataNxFile.ChecksumMismatch -f $this.DestinationPath, $this.Checksum, $currentState.Checksum
                     }
@@ -258,7 +258,7 @@ class nxFile
 
                 'Mode'
                 {
-                    [Reason]@{
+                    [NxFileReason]@{
                         Code = '{0}:{0}:Mode' -f $this.GetType()
                         Phrase = $script:localizedDataNxFile.ModeMismatch -f $this.DestinationPath, $this.Mode, $currentState.Mode
                     }
@@ -266,7 +266,7 @@ class nxFile
 
                 'Owner'
                 {
-                    [Reason]@{
+                    [NxFileReason]@{
                         Code = '{0}:{0}:Owner' -f $this.GetType()
                         Phrase = $script:localizedDataNxFile.OwnerMismatch -f $this.DestinationPath, $this.Owner, $currentState.Owner
                     }
@@ -274,7 +274,7 @@ class nxFile
 
                 'Group'
                 {
-                    [Reason]@{
+                    [NxFileReason]@{
                         Code = '{0}:{0}:Group' -f $this.GetType()
                         Phrase = $script:localizedDataNxFile.GroupMismatch -f $this.DestinationPath, $this.Group, $currentState.Group
                     }
@@ -284,12 +284,12 @@ class nxFile
         else
         {
             # No item found for this Destination path
-            $currentState.Ensure = [Ensure]::Absent
+            $currentState.Ensure = [NxFileEnsure]::Absent
 
             if ($this.Ensure -ne $currentState.Ensure)
             {
                 # We expected the file to be Present
-                $currentState.Reasons = [Reason]@{
+                $currentState.Reasons = [NxFileReason]@{
                     Code = '{0}:{0}:Ensure' -f $this.GetType()
                     Phrase = $script:localizedDataNxFile.nxItemNotFound -f $this.DestinationPath
                 }
@@ -315,7 +315,7 @@ class nxFile
     {
         $currentState = $this.Get()
 
-        if ($this.Ensure -eq [Ensure]::Present) # Desired State: Ensure present
+        if ($this.Ensure -eq [NxFileEnsure]::Present) # Desired State: Ensure present
         {
             if ($currentState.Ensure -ne $this.Ensure) # but is absent
             {
@@ -405,7 +405,7 @@ class nxFile
         else # Desired to be Absent
         {
             $nxFileSystemInfo = Get-nxItem -Path $this.DestinationPath -ErrorAction Stop | Where-Object -FilterScript { $this.Type -eq $_.nxFileSystemItemType}
-            if ($nxFileSystemInfo -and $currentState.Ensure -eq [Ensure]::Present)
+            if ($nxFileSystemInfo -and $currentState.Ensure -eq [NxFileEnsure]::Present)
             {
                 Remove-Item -Path $nxFileSystemInfo.DestinationPath -Force:($this.Force) -Recurse:($this.Recurse) -Confirm:$false
             }
